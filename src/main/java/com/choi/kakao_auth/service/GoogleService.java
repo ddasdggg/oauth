@@ -1,7 +1,6 @@
 package com.choi.kakao_auth.service;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,19 +11,20 @@ import java.net.URL;
 import java.util.HashMap;
 
 @Service
-public class KakaoService {
+public class GoogleService {
 
-
-    @Value("${kakao.client-id}")
+    @Value("${google.client-id}")
     private String clientId;
-    @Value("${kakao.redirect_uri}")
+
+    @Value("${google.client-secret")
+    private String clientSecret;
+
+    @Value("${google.client-secret}")
     private String redirectUri;
 
-    public String getAccessToken (String authorize_code) {
+    public String getAccessToken(String authorize_code) {
         String access_Token = "";
-        String refresh_Token = "";
-        String email = "";
-        String reqURL = "https://kauth.kakao.com/oauth/token";
+        String reqURL = "https://accounts.google.com/o/oauth2/token";
 
         try {
             URL url = new URL(reqURL);
@@ -41,6 +41,7 @@ public class KakaoService {
             StringBuilder sb = new StringBuilder();
             sb.append("grant_type=authorization_code");
             sb.append("&client_id="+clientId);  //본인이 발급받은 key
+            sb.append("&client_secret="+clientSecret);
             sb.append("&redirect_uri="+redirectUri);     // 본인이 설정해 놓은 경로
             sb.append("&code=" + authorize_code);
             bw.write(sb.toString());
@@ -65,11 +66,8 @@ public class KakaoService {
             JsonElement element = parser.parse(result);
 
             access_Token = element.getAsJsonObject().get("access_token").getAsString();
-            refresh_Token = element.getAsJsonObject().get("refresh_token").getAsString();
 
             System.out.println("access_token : " + access_Token);
-            System.out.println("refresh_token : " + refresh_Token);
-            System.out.println("refresh_token : " + email);
 
             br.close();
             bw.close();
@@ -85,7 +83,7 @@ public class KakaoService {
 
         //    요청하는 클라이언트마다 가진 정보가 다를 수 있기에 HashMap타입으로 선언
         HashMap<String, Object> userInfo = new HashMap<>();
-        String reqURL = "https://kapi.kakao.com/v2/user/me";
+        String reqURL = "https://www.googleapis.com/oauth2/v1/tokeninfo";
         try {
             URL url = new URL(reqURL);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -110,13 +108,11 @@ public class KakaoService {
             JsonParser parser = new JsonParser();
             JsonElement element = parser.parse(result);
 
-            JsonObject properties = element.getAsJsonObject().get("properties").getAsJsonObject();
-            JsonObject kakao_account = element.getAsJsonObject().get("kakao_account").getAsJsonObject();
+            String account = element.getAsJsonObject().get("user_id").getAsString();
 
-            String nickname = properties.getAsJsonObject().get("nickname").getAsString();
-            String email = kakao_account.getAsJsonObject().get("email").getAsString();
+            String email = element.getAsJsonObject().get("email").getAsString();
 
-            userInfo.put("nickname", nickname);
+            userInfo.put("account", account);
             userInfo.put("email", email);
 
         } catch (IOException e) {

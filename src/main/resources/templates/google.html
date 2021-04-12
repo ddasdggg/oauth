@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<a th:href="'https://accounts.google.com/o/oauth2/auth?response_type=code&access_type=offline&client_id='+${@environment.getProperty('google.client-id')}+'&redirect_uri='+${@environment.getProperty('google.redirect.uri')}+'&scope=email'">로그인</a>
+</body>
+</html>
