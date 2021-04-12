@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<a th:href="'https://nid.naver.com/oauth2.0/authorize?client_id='+${@environment.getProperty('naver.client-id')}+'&redirect_uri='+${@environment.getProperty('naver.redirect_uri')}+'&response_type=code&state='+${#strings.randomAlphanumeric(20)}">로그인</a>
+
+</body>
+</html>
+
